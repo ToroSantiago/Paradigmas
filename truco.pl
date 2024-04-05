@@ -62,26 +62,22 @@ valor(carta(1,espada), 14).
 resultado(Carta1, Carta2, Resultado) :-
     valor(Carta1, Valor1),
     valor(Carta2, Valor2),
-    comparar(Valor1, Valor2, Resultado).
+    comparar(Valor1, Valor2, Resultado), !.
 
 % comparar: compara los valores de dos cartas
 comparar(Valor1, Valor2, Resultado) :-
     Valor1 > Valor2,
-    Resultado = gana.
+    Resultado = gana, !.
 comparar(Valor1, Valor2, Resultado) :-
     Valor1 < Valor2,
-    Resultado = pierde.
+    Resultado = pierde, !.
 comparar(Valor1, Valor2, Resultado) :-
     Valor1 =:= Valor2,  % usar cat
-    Resultado = parda.
+    Resultado = parda, !.
 
 
 
 % OBJETIVOS INTERMEDIOS
-
-envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
-	sumaMayor(Numero1,Numero2,Numero3,Suma),
-	Valor is Suma + 20, !.
 
 envido([carta(Numero1,Palo1),carta(Numero2,Palo1),carta(_,_)],Valor) :-
 	esFigura(Numero1), esFigura(Numero2), Valor is 20
@@ -100,6 +96,16 @@ envido([carta(Numero1,Palo1),carta(_,_),carta(Numero3,Palo1)],Valor) :-
 	;esFigura(Numero1), not(esFigura(Numero3)), Valor is Numero3 + 20
 	;not(esFigura(Numero1)), esFigura(Numero3), Valor is Numero1 + 20
 	;not(esFigura(Numero1)), not(esFigura(Numero3)), Valor is Numero1 + Numero3 + 20, !.
+
+envido([carta(Numero1,Palo),carta(Numero2,Palo)], Valor) :-				%envido condos argumentos para aceptarEnvido() con dos cartas en mesa
+	esFigura(Numero1), esFigura(Numero2), Valor is 20
+	;esFigura(Numero1), not(esFigura(Numero2)), Valor is Numero2 + 20
+	;not(esFigura(Numero1)), esFigura(Numero2), Valor is Numero1 + 20
+	;not(esFigura(Numero1)), not(esFigura(Numero2)), Valor is Numero1 + Numero2 + 20, !.
+
+envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
+	sumaMayor(Numero1,Numero2,Numero3,Suma),
+	Valor is Suma + 20, !.
 
 sumaMayor(Numero1,Numero2,Numero3,Suma) :-
 	(Numero1 > Numero3,
@@ -151,23 +157,37 @@ mejorJugado([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[ca
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,_)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1), % obtengo valor envido
-	(Numero4 < 6
-	;Valor1  =:= 33), !.
+	(
+	Valor1 =:= 33    	% tengo el mayor valor, no puedo perder
+	;Numero4 < 6		% no hay peligro de envido de mayor valor por parte del enemigo (asumiendo que carta4 la usa para el envido)
+	;
+	(esFigura(Numero4), 
+	Valor1 > 27)
+	), !.
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1),
-	envido([carta(Numero4,Palo4),carta(Numero5,Palo5),carta(_,_)],Valor2),
-	comparar(Valor1,Valor2,Resultado),
-	Resultado == gana.
+	(envido([carta(Numero4,Palo4),carta(Numero5,Palo5)],Valor2),
+	comparar(Valor1,Valor2,Resultado), !,
+	Resultado == gana), !
+	;aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4)]), !
+	;aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero5,Palo5)]), !.
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1),
 	envido([carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)],Valor2),
-	comparar(Valor1,Valor2,Resultado),
-	Resultado == gana.
+	comparar(Valor1,Valor2,Resultado), !,
+	Resultado == gana, !.
 
 
-/*
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)], [carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]]) :-
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[], [carta(Numero4,Palo4)]]) :-
 	.
-*/
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :-
+	.
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
+	.
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
+	.
