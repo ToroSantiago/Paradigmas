@@ -202,3 +202,11 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(_,_),carta(Numero5,Palo5)]]) :- % ultima carta del contrincante: carta 5
 	resultado(carta(Numero3,Palo3),carta(Numero5,Palo5),Resultado),
 	(Resultado == gana), !.
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2),], [_,_,carta(Numero6,Palo6)]]) :- % ultima carta del contrincante: carta 5
+	resultado(carta(Numero3,Palo3),carta(Numero6,Palo6),Resultado),
+	(Resultado == gana), !.
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[_,_,carta(Numero3,Palo3)], [_,_,carta(Numero6,Palo6)]]) :- % ultima carta del contrincante: carta 5
+	resultado(carta(Numero3,Palo3),carta(Numero6,Palo6),Resultado),
+	(Resultado == gana), !.
