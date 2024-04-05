@@ -1,5 +1,5 @@
 :- include(cartas).
-
+ 
 % OBJETIVOS PRELIMINARES
 
 % valor/2: Determina el valor de una carta dada su posición en la escala de valores.
@@ -149,11 +149,10 @@ mejorJugado([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[ca
 
 % OBJETIVO PRINCIPAL
 
-aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4)]) :-
-	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1),
-	valor(carta(Numero4,Palo4),Valor2),
-	Resultado = Valor1 - 20 - Valor2, 
-	Resultado == gana.
+aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,_)]) :-
+	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1), % obtengo valor envido
+	(Numero4 < 6
+	;Valor1  =:= 33), !.
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1),
