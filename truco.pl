@@ -157,13 +157,10 @@ mejorJugado([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[ca
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,_)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1), % obtengo valor envido
-	(
-	Valor1 =:= 33    	% tengo el mayor valor, no puedo perder
+	(Valor1 =:= 33    	% tengo el mayor valor, no puedo perder
 	;Numero4 < 6		% no hay peligro de envido de mayor valor por parte del enemigo (asumiendo que carta4 la usa para el envido)
-	;
-	(esFigura(Numero4), 
-	Valor1 > 27)
-	), !.
+	;(esFigura(Numero4), 
+	Valor1 > 27)), !.
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5)]) :-
 	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1),
@@ -180,14 +177,28 @@ aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[
 	Resultado == gana, !.
 
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[], [carta(Numero4,Palo4)]]) :-
-	.
+%Para el truco usamos las cartas que aun no tenemos comparadas con la ultima carta que tiro el contrincante
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :-
-	.
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[], [carta(Numero4,Palo4)]]) :- % ultima carta del contrincante: carta 4
+	resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),
+	resultado(carta(Numero2,Palo2),carta(Numero4,Palo4),Resultado2),
+	resultado(carta(Numero3,Palo3),carta(Numero4,Palo4),Resultado3),
+	((Resultado1 == gana)
+	;(Resultado2 == gana)
+	;(Resultado3 == gana)), !.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
-	.
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :- % ultima carta del contrincante: carta 4
+	resultado(carta(Numero2,Palo2),carta(Numero4,Palo4),Resultado1),
+	resultado(carta(Numero3,Palo3),carta(Numero4,Palo4),Resultado2),
+	((Resultado1 == gana)
+	;(Resultado2 == gana)), !.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
-	.
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(_,_),carta(Numero5,Palo5)]]) :- % ultima carta del contrincante: carta 5
+	resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado1),
+	resultado(carta(Numero3,Palo3),carta(Numero5,Palo5),Resultado2),
+	((Resultado1 == gana)
+	;(Resultado2 == gana)), !.
+
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(_,_),carta(Numero5,Palo5)]]) :- % ultima carta del contrincante: carta 5
+	resultado(carta(Numero3,Palo3),carta(Numero5,Palo5),Resultado),
+	(Resultado == gana), !.
