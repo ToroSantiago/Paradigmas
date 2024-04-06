@@ -75,37 +75,40 @@ comparar(Valor1, Valor2, Resultado) :-
     Valor1 =:= Valor2,  % usar cat
     Resultado = parda, !.
 
-
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 % OBJETIVOS INTERMEDIOS
 
-envido([carta(Numero1,Palo1),carta(Numero2,Palo1),carta(_,_)],Valor) :-
+envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
+	sumaMayor(Numero1,Numero2,Numero3,Suma),
+	(esFigura(Numero1, Figura), Suma is Suma - Figura 
+	;esFigura(Numero2, Figura), Suma is Suma - Figura
+	;esFigura(Numero3, Figura), Suma is Suma - Figura),
+	Valor is Suma + 20, !.
+
+envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(_,_)],Valor) :-
 	esFigura(Numero1), esFigura(Numero2), Valor is 20
 	;esFigura(Numero1), not(esFigura(Numero2)), Valor is Numero2 + 20
 	;not(esFigura(Numero1)), esFigura(Numero2), Valor is Numero1 + 20
 	;not(esFigura(Numero1)), not(esFigura(Numero2)), Valor is Numero1 + Numero2 + 20, !.
 
-envido([carta(_,_),carta(Numero2,Palo2),carta(Numero3,Palo2)],Valor) :-
+envido([carta(_,_),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
 	esFigura(Numero2), esFigura(Numero3), Valor is 20
 	;esFigura(Numero2), not(esFigura(Numero3)), Valor is Numero3 + 20
 	;not(esFigura(Numero2)), esFigura(Numero3), Valor is Numero2 + 20
 	;not(esFigura(Numero2)), not(esFigura(Numero3)), Valor is Numero2 + Numero3 + 20, !.
 
-envido([carta(Numero1,Palo1),carta(_,_),carta(Numero3,Palo1)],Valor) :-
+envido([carta(Numero1,Palo),carta(_,_),carta(Numero3,Palo)],Valor) :-
 	esFigura(Numero1), esFigura(Numero3), Valor is 20
 	;esFigura(Numero1), not(esFigura(Numero3)), Valor is Numero3 + 20
 	;not(esFigura(Numero1)), esFigura(Numero3), Valor is Numero1 + 20
 	;not(esFigura(Numero1)), not(esFigura(Numero3)), Valor is Numero1 + Numero3 + 20, !.
 
-envido([carta(Numero1,Palo),carta(Numero2,Palo)], Valor) :-				%envido condos argumentos para aceptarEnvido() con dos cartas en mesa
+envido([carta(Numero1,Palo),carta(Numero2,Palo)], Valor) :-				%envido con dos argumentos para aceptarEnvido() con dos cartas en mesa
 	esFigura(Numero1), esFigura(Numero2), Valor is 20
 	;esFigura(Numero1), not(esFigura(Numero2)), Valor is Numero2 + 20
 	;not(esFigura(Numero1)), esFigura(Numero2), Valor is Numero1 + 20
 	;not(esFigura(Numero1)), not(esFigura(Numero2)), Valor is Numero1 + Numero2 + 20, !.
-
-envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
-	sumaMayor(Numero1,Numero2,Numero3,Suma),
-	Valor is Suma + 20, !.
 
 sumaMayor(Numero1,Numero2,Numero3,Suma) :-
 	(Numero1 > Numero3,
@@ -117,10 +120,14 @@ sumaMayor(Numero1,Numero2,Numero3,Suma) :-
 	(Numero1 > Numero2,
 	Numero3 > Numero2,
 	Suma is Numero1 + Numero3).	
-	
 
 esFigura(Numero) :- 
 	Numero =:= 10; Numero =:= 11; Numero =:= 12.
+
+esFigura(Numero, Figura) :-
+	Numero =:= 10, Figura is 10
+	;Numero =:= 11, Figura is 11
+	;Numero =:= 12, Figura is 12.
 
 
 gana([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]) :-
@@ -135,7 +142,7 @@ gana([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Num
 mejorJugado([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)],Orden) :-
 	gana([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]), % 1 2 3
 	Orden = [carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)]
-
+	
 	; gana([carta(Numero1,Palo1),carta(Numero3,Palo3),carta(Numero2,Palo2)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]), % 1 3 2
 	Orden = [carta(Numero1,Palo1),carta(Numero3,Palo3),carta(Numero2,Palo2)]
 
@@ -151,14 +158,14 @@ mejorJugado([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[ca
 	; gana([carta(Numero3,Palo3),carta(Numero1,Palo1),carta(Numero2,Palo2)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]), % 3 1 2
 	Orden = [carta(Numero3,Palo3),carta(Numero1,Palo1),carta(Numero2,Palo2)], !.
 
-
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 % OBJETIVO PRINCIPAL
 
 aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,_)]) :-
-	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1), % obtengo valor envido
-	(Valor1 =:= 33    	% tengo el mayor valor, no puedo perder
-	;Numero4 < 6		% no hay peligro de envido de mayor valor por parte del enemigo (asumiendo que carta4 la usa para el envido)
+	envido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],Valor1), 
+	(Valor1 =:= 33    	
+	;Numero4 < 6		
 	;(esFigura(Numero4), 
 	Valor1 > 27)), !.
 
@@ -177,8 +184,6 @@ aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[
 	Resultado == gana, !.
 
 
-%Para el truco usamos las cartas que aun no tenemos comparadas con la ultima carta que tiro el contrincante
-
  % nadie tiro nada y estas aceptando truco = el otro es Mano
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 			[[],[]]) :- 
@@ -190,8 +195,8 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 	Valor3 > 7), !.
 
 % tiraste una carta = sos mano
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%cartas propias
-			[[carta(Numero1,Palo1)], []]) :-                                    %cartas en mesa: 1 propias, 0 del rival
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[carta(Numero1,Palo1)], []]) :-                                    
 	(valor(carta(Numero1,Palo1), Valor1),
 	Valor1 > 7)
 	;(valor(carta(Numero2,Palo2), Valor2),
@@ -200,8 +205,8 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%
 	Valor3 > 7), !.
 
 % tiraron la misma cantidad de cartas y estas aceptando truco = el otro es Mano
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%cartas propias
-			[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :-  				%cartas en mesa: 1 propias, 1 del rival
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :-  				
 	(valor(carta(Numero1,Palo1), Valor1),
 	Valor1 > 7)
 	;(valor(carta(Numero2,Palo2), Valor2),
@@ -209,8 +214,7 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%
 	;(valor(carta(Numero3,Palo3), Valor3),
 	Valor3 > 7)
 	;(valor(carta(Numero4,Palo4), Valor4),
-	Valor4 > 7), !.	% si tiro una carta de valor alto al principio, podemos asumir, que la probabilidad de que tenga buenas cartas despues, es baja
-
+	Valor4 > 7), !.	
 
 % tiraste una carta = sos mano
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
@@ -222,15 +226,11 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 	;(valor(carta(Numero3,Palo3), Valor3),
 	Valor3 > 7)
 	;(valor(carta(Numero4,Palo4), Valor4),
-	Valor4 > 7), !.	% si tiro una carta de valor alto al principio, podemos asumir, que la probabilidad de que tenga buenas cartas despues, es baja!.
+	Valor4 > 7), !.	
 
 % tiraron la misma cantidad de cartas y estas aceptando truco = el otro es Mano
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 			[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
-	%resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),	
-	%resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado2),	
-	%((Resultado1 == gana)		% si le gane la primera tirada
-	%;(Resultado2 == gana)), !. 	% y le gane la segunda tirada, quiere decir que no tiene sentido aceptar truco porque ya le gane la mano, pero igual devuelve verdadero
 	(valor(carta(Numero1,Palo1), Valor1),
 	Valor1 > 7), !
 	;(valor(carta(Numero2,Palo2), Valor2),
@@ -245,10 +245,6 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 % tiraste una carta = sos mano
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 			[[carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :- 
-	%resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),	
-	%resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado2),	
-	%((Resultado1 == gana)		% si le gane la primera tirada
-	%;(Resultado2 == gana)), !. 	% y le gane la segunda tirada, quiere decir que no tiene sentido aceptar truco porque ya le gane la mano, pero igual devuelve verdadero
 	(valor(carta(Numero1,Palo1), Valor1),
 	Valor1 > 7), !
 	;(valor(carta(Numero2,Palo2), Valor2),
@@ -260,15 +256,3 @@ aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 	;(valor(carta(Numero5,Palo5), Valor5),
 	Valor5 > 7), !.
 
-	/*
-	gane la primera y segunda tirada = no tiene sentido aceptar truco
-	perdi la primera y segunda tirada = no tiene sentido aceptar truco
-	gane la primera y empate la segunda tirada = no tiene sentido aceptar truco
-	perdi la primera y empate la segunda tirada = no tiene sentido aceptar truco
-	empate la primera y gane la segunda tirada = no tiene sentido aceptar truco
-	empate la primera y perdi la segunda tirada = no tiene sentido aceptar truco
-
-
-	gane la primera y perdi la segunda tirada = tiene sentido aceptar truco
-	perdi la primera y gane la segunda tirada = tiene sentido aceptar trucow cow = vaca en ingles
-	*/
