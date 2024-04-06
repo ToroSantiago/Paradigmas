@@ -179,34 +179,96 @@ aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[
 
 %Para el truco usamos las cartas que aun no tenemos comparadas con la ultima carta que tiro el contrincante
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[], [carta(Numero4,Palo4)]]) :- % ultima carta del contrincante: carta 4
-	resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),
-	resultado(carta(Numero2,Palo2),carta(Numero4,Palo4),Resultado2),
-	resultado(carta(Numero3,Palo3),carta(Numero4,Palo4),Resultado3),
-	((Resultado1 == gana)
-	;(Resultado2 == gana)
-	;(Resultado3 == gana)), !.
+ % nadie tiro nada y estas aceptando truco = el otro es Mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[],[]]) :- 
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7)
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7)
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7), !.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :- % ultima carta del contrincante: carta 4
-	resultado(carta(Numero2,Palo2),carta(Numero4,Palo4),Resultado1),
-	resultado(carta(Numero3,Palo3),carta(Numero4,Palo4),Resultado2),
-	((Resultado1 == gana)
-	;(Resultado2 == gana)), !.
+% tiraste una carta = sos mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%cartas propias
+			[[carta(Numero1,Palo1)], []]) :-                                    %cartas en mesa: 1 propias, 0 del rival
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7)
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7)
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7), !.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1)], [carta(_,_),carta(Numero5,Palo5)]]) :- % ultima carta del contrincante: carta 5
-	resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado1),
-	resultado(carta(Numero3,Palo3),carta(Numero5,Palo5),Resultado2),
-	((Resultado1 == gana)
-	;(Resultado2 == gana)), !.
+% tiraron la misma cantidad de cartas y estas aceptando truco = el otro es Mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],	%cartas propias
+			[[carta(Numero1,Palo1)], [carta(Numero4,Palo4)]]) :-  				%cartas en mesa: 1 propias, 1 del rival
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7)
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7)
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7)
+	;(valor(carta(Numero4,Palo4), Valor4),
+	Valor4 > 7), !.	% si tiro una carta de valor alto al principio, podemos asumir, que la probabilidad de que tenga buenas cartas despues, es baja
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(_,_),carta(Numero5,Palo5)]]) :- % ultima carta del contrincante: carta 5
-	resultado(carta(Numero3,Palo3),carta(Numero5,Palo5),Resultado),
-	(Resultado == gana), !.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[carta(Numero1,Palo1),carta(Numero2,Palo2),], [_,_,carta(Numero6,Palo6)]]) :- % ultima carta del contrincante: carta 5
-	resultado(carta(Numero3,Palo3),carta(Numero6,Palo6),Resultado),
-	(Resultado == gana), !.
+% tiraste una carta = sos mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(Numero4,Palo4)]]) :- 
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7)
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7)
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7)
+	;(valor(carta(Numero4,Palo4), Valor4),
+	Valor4 > 7), !.	% si tiro una carta de valor alto al principio, podemos asumir, que la probabilidad de que tenga buenas cartas despues, es baja!.
 
-aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[[_,_,carta(Numero3,Palo3)], [_,_,carta(Numero6,Palo6)]]) :- % ultima carta del contrincante: carta 5
-	resultado(carta(Numero3,Palo3),carta(Numero6,Palo6),Resultado),
-	(Resultado == gana), !.
+% tiraron la misma cantidad de cartas y estas aceptando truco = el otro es Mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[carta(Numero1,Palo1),carta(Numero2,Palo2)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :-
+	%resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),	
+	%resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado2),	
+	%((Resultado1 == gana)		% si le gane la primera tirada
+	%;(Resultado2 == gana)), !. 	% y le gane la segunda tirada, quiere decir que no tiene sentido aceptar truco porque ya le gane la mano, pero igual devuelve verdadero
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7), !
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7), !
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7), !
+	;(valor(carta(Numero4,Palo4), Valor4),
+	Valor4 > 7), !
+	;(valor(carta(Numero5,Palo5), Valor5),
+	Valor5 > 7), !.
+
+% tiraste una carta = sos mano
+aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
+			[[carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)], [carta(Numero4,Palo4),carta(Numero5,Palo5)]]) :- 
+	%resultado(carta(Numero1,Palo1),carta(Numero4,Palo4),Resultado1),	
+	%resultado(carta(Numero2,Palo2),carta(Numero5,Palo5),Resultado2),	
+	%((Resultado1 == gana)		% si le gane la primera tirada
+	%;(Resultado2 == gana)), !. 	% y le gane la segunda tirada, quiere decir que no tiene sentido aceptar truco porque ya le gane la mano, pero igual devuelve verdadero
+	(valor(carta(Numero1,Palo1), Valor1),
+	Valor1 > 7), !
+	;(valor(carta(Numero2,Palo2), Valor2),
+	Valor2 > 7), !
+	;(valor(carta(Numero3,Palo3), Valor3),
+	Valor3 > 7), !
+	;(valor(carta(Numero4,Palo4), Valor4),
+	Valor4 > 7), !
+	;(valor(carta(Numero5,Palo5), Valor5),
+	Valor5 > 7), !.
+
+	/*
+	gane la primera y segunda tirada = no tiene sentido aceptar truco
+	perdi la primera y segunda tirada = no tiene sentido aceptar truco
+	gane la primera y empate la segunda tirada = no tiene sentido aceptar truco
+	perdi la primera y empate la segunda tirada = no tiene sentido aceptar truco
+	empate la primera y gane la segunda tirada = no tiene sentido aceptar truco
+	empate la primera y perdi la segunda tirada = no tiene sentido aceptar truco
+
+
+	gane la primera y perdi la segunda tirada = tiene sentido aceptar truco
+	perdi la primera y gane la segunda tirada = tiene sentido aceptar trucow cow = vaca en ingles
+	*/
