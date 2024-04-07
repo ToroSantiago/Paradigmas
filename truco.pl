@@ -2,7 +2,7 @@
  
 % OBJETIVOS PRELIMINARES
 
-% valor/2: Determina el valor de una carta dada su posición en la escala de valores.
+%-------------------------------------------------Valores para el truco-------------------------------------
 
 valor(carta(4,espada), 1). 
 valor(carta(4,basto), 1).  
@@ -58,6 +58,62 @@ valor(carta(1,basto), 13).
 
 valor(carta(1,espada), 14).   
 
+%-------------------------------------------------Valores para el envido-------------------------------------
+
+valorEnvido(carta(4,espada), 4). 
+valorEnvido(carta(4,basto), 4).  
+valorEnvido(carta(4,oro), 4).    
+valorEnvido(carta(4,copa), 4).   
+
+valorEnvido(carta(5,espada), 5).   
+valorEnvido(carta(5,basto), 5).   
+valorEnvido(carta(5,oro), 5).   
+valorEnvido(carta(5,copa), 5).   
+
+valorEnvido(carta(6,espada), 6).    
+valorEnvido(carta(6,basto), 6).    
+valorEnvido(carta(6,oro), 6).    
+valorEnvido(carta(6,copa), 6).    
+
+valorEnvido(carta(7,basto), 7).    
+valorEnvido(carta(7,copa), 7).    
+
+valorEnvido(carta(10,espada), 0).
+valorEnvido(carta(10,basto), 0). 
+valorEnvido(carta(10,oro), 0).  
+valorEnvido(carta(10,copa), 0).  
+
+valorEnvido(carta(11,espada), 0).
+valorEnvido(carta(11,basto), 0). 
+valorEnvido(carta(11,oro), 0).  
+valorEnvido(carta(11,copa), 0).  
+
+valorEnvido(carta(12,espada), 0).
+valorEnvido(carta(12,basto), 0).  
+valorEnvido(carta(12,oro), 0).
+valorEnvido(carta(12,copa), 0).  
+
+valorEnvido(carta(1,oro), 1).
+valorEnvido(carta(1,copa), 1).   
+
+valorEnvido(carta(2,espada), 2). 
+valorEnvido(carta(2,basto), 2). 
+valorEnvido(carta(2,oro), 2).   
+valorEnvido(carta(2,copa), 2).  
+
+valorEnvido(carta(3,espada), 3).   
+valorEnvido(carta(3,basto), 3).    
+valorEnvido(carta(3,oro), 3).    
+valorEnvido(carta(3,copa), 3).   
+
+valorEnvido(carta(7,oro), 7).    
+
+valorEnvido(carta(7,espada), 7).    
+
+valorEnvido(carta(1,basto), 1).    
+
+valorEnvido(carta(1,espada), 1).   
+
 % resultado: determina el resultado de enfrentar dos cartas
 resultado(Carta1, Carta2, Resultado) :-
     valor(Carta1, Valor1),
@@ -79,15 +135,24 @@ comparar(Valor1, Valor2, Resultado) :-
 
 % OBJETIVOS INTERMEDIOS
 
+% envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
+% 	(envido([carta(Numero1,Palo),carta(Numero2,Palo)],Envido1),
+% 	envido([carta(Numero2,Palo),carta(Numero3,Palo)],Envido2),
+% 	envido([carta(Numero1,Palo),carta(Numero3,Palo)],Envido3)),
+% 	(Envido1 >= Envido2,
+% 	Envido1 >= Envido3 -> Valor = Envido1)
+% 	;(Envido2 >= Envido3 -> Valor = Envido2)
+% 	;( Valor = Envido3).
+
 envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
-	sumaMayor(Numero1,Numero2,Numero3,Suma),
-	(esFigura(Numero1, Figura), Suma is Suma - Figura 
-	;esFigura(Numero2, Figura), Suma is Suma - Figura
-	;esFigura(Numero3, Figura), Suma is Suma - Figura),
+	valorEnvido(carta(Numero1,Palo),Valor1),
+	valorEnvido(carta(Numero2,Palo),Valor2),
+	valorEnvido(carta(Numero3,Palo),Valor3),
+	sumaMayor(Valor1,Valor2,Valor3,Suma),
 	Valor is Suma + 20, !.
 
 envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(_,_)],Valor) :-
-	esFigura(Numero1), esFigura(Numero2), Valor is 20
+	esFigura(Numero1), esFigura(Numero2), Valor is 20, !
 	;esFigura(Numero1), not(esFigura(Numero2)), Valor is Numero2 + 20
 	;not(esFigura(Numero1)), esFigura(Numero2), Valor is Numero1 + 20
 	;not(esFigura(Numero1)), not(esFigura(Numero2)), Valor is Numero1 + Numero2 + 20, !.
@@ -124,10 +189,9 @@ sumaMayor(Numero1,Numero2,Numero3,Suma) :-
 esFigura(Numero) :- 
 	Numero =:= 10; Numero =:= 11; Numero =:= 12.
 
-esFigura(Numero, Figura) :-
-	Numero =:= 10, Figura is 10
-	;Numero =:= 11, Figura is 11
-	;Numero =:= 12, Figura is 12.
+anular(Numero,NumeroAnulado) :- 
+	NumeroAnulado is 0,
+	esFigura(Numero).
 
 
 gana([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]) :-
@@ -184,7 +248,7 @@ aceptarEnvido([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[
 	Resultado == gana, !.
 
 
- % nadie tiro nada y estas aceptando truco = el otro es Mano
+% nadie tiro nada y estas aceptando truco = el otro es Mano
 aceptarTruco([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],
 			[[],[]]) :- 
 	(valor(carta(Numero1,Palo1), Valor1),
