@@ -135,6 +135,15 @@ comparar(Valor1, Valor2, Resultado) :-
 
 % OBJETIVOS INTERMEDIOS
 
+% envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
+% 	(envido([carta(Numero1,Palo),carta(Numero2,Palo)],Envido1),
+% 	envido([carta(Numero2,Palo),carta(Numero3,Palo)],Envido2),
+% 	envido([carta(Numero1,Palo),carta(Numero3,Palo)],Envido3)),
+% 	(Envido1 >= Envido2,
+% 	Envido1 >= Envido3 -> Valor = Envido1)
+% 	;(Envido2 >= Envido3 -> Valor = Envido2)
+% 	;( Valor = Envido3).
+
 envido([carta(Numero1,Palo),carta(Numero2,Palo),carta(Numero3,Palo)],Valor) :-
 	valorEnvido(carta(Numero1,Palo),Valor1),
 	valorEnvido(carta(Numero2,Palo),Valor2),
@@ -179,6 +188,10 @@ sumaMayor(Numero1,Numero2,Numero3,Suma) :-
 
 esFigura(Numero) :- 
 	Numero =:= 10; Numero =:= 11; Numero =:= 12.
+
+anular(Numero,NumeroAnulado) :- 
+	NumeroAnulado is 0,
+	esFigura(Numero).
 
 
 gana([carta(Numero1,Palo1),carta(Numero2,Palo2),carta(Numero3,Palo3)],[carta(Numero4,Palo4),carta(Numero5,Palo5),carta(Numero6,Palo6)]) :-
