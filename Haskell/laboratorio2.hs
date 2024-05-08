@@ -1,30 +1,29 @@
+
+--Objetivo 1
+-- Definición del tipo de datos para representar una persona
 data Persona = Persona {
     nombre :: String
 } deriving(Show, Eq)
 
-amigos = [Persona]
+--Objetivo 1.1(?)
+amigos = [Persona "Juan", Persona "Pedro", Persona "Santiago"]
 
---persona1 =  Persona {nombre = "Juan"}
---persona2 =  Persona {nombre = "Pedro"}
---persona3 =  Persona {nombre = "Santiago"}
+ 
+--Objetivo 2
+-- Definición del tipo de datos para representar un gasto
+data Gasto = Gasto {
+    pagador :: Persona,
+    montoTotal :: Int
+} deriving(Show, Eq)
 
+-- -- Definición del tipo de datos para representar una deuda
+data Deuda = Deuda {
+    deudor :: Persona,   --Persona/s que debe pagar la deuda
+    acreedor :: Persona, --Persona a la cual hay que pagarle la deuda
+    montoDeuda :: Int
+} deriving(Show, Eq)
 
-
-{-tuplas =  [("juan", 10), ("pedro", 20)]
-sumaTuplas :: [(String, Integer)] -> Integer
- sumaTuplas [] = 0
- sumaTuplas ((nombre, cantidad) : resto) = 
-     cantidad + sumaTuplas resto
-sumaTuplas = sum . (map extraerCantidad)
-
-extraerCantidades :: [(String, Integer)] -> [Integer]   
-extraerCantidades []  = []
-extraerCantidades ((nombre, cantidad) : resto) =
-    (cantidad : extraerCantidades resto)
-
-extraerCantidad :: (String, Integer) -> Integer
-extraerCantidad (nombre, cantidad) = cantidad -}
-
--- map :: (a -> b) -> [a] -> [b]
--- filter :: (a -> Bool) -> [a] -> [a]
--- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+--Objetivo 2.1
+-- Funcion
+calcularDeudas amigos (Gasto pagador montoTotal) =
+    let montoPersona = montoTotal / fromIntegral (length amigos)
