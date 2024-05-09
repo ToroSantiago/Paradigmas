@@ -36,10 +36,12 @@ agregarDeuda persona deuda = persona { deudas = deudas persona ++ [deuda] }
     actualizarDeudas restoDeudas funcion monto -}
         
 --actualizarDeudas :: Deudas -> (Float -> Float -> Float) -> Float -> Deudas
+actualizarDeudas :: [Deuda] -> (Float -> t -> Float) -> t -> [Deuda]
 actualizarDeudas [] _ _ = []
 actualizarDeudas (deuda : restoDeudas) funcion monto =
     deuda { montoDeuda = funcion (montoDeuda deuda) monto } : actualizarDeudas restoDeudas funcion monto
 
+actualizarDeudasDePersonas :: [Persona] -> Gasto -> t -> [Persona]
 actualizarDeudasDePersonas [] _ _ = []
 actualizarDeudasDePersonas (persona : restoPersonas) (Gasto pagador montoTotal) cantidadPersonas =
     let montoPorDeudor = montoTotal / fromIntegral cantidadPersonas
