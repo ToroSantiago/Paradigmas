@@ -1,4 +1,4 @@
---Definición del tipo de datos para representar una persona
+-- Definición del tipo de datos para representar una persona
 data Persona = Persona {
     nombre :: String
 } deriving (Show, Eq)
@@ -16,15 +16,19 @@ data Deuda = Deuda {
     montoDeuda :: Float
 } deriving (Show)
 
-
 -- Función para calcular las deudas después de un gasto
-calcularDeudas :: [Persona] -> Gasto -> [Deuda]
-calcularDeudas amigos (Gasto pagador monto) =
+crearDeudas :: [Persona] -> Gasto -> [Deuda]
+crearDeudas amigos (Gasto pagador monto) =
     let montoPorPersona = monto / fromIntegral (length amigos)
         deudores = filter (\p -> p /= pagador) amigos
     in map (\deudor -> Deuda deudor pagador montoPorPersona) deudores
 
 
+
+{- listarDeudas [] = []
+listarDeudas (deuda : restoDeudas) =
+    deuda 
+    listarDeudas restoDeudas -}
 
 -- Ejemplo de uso
 main :: IO ()
@@ -43,8 +47,8 @@ main = do
     print gasto1
     print gasto2
     
-    let deudas = calcularDeudas amigos gasto1
-        nuevasDeudas = calcularDeudas amigos gasto2
+    let deudas = crearDeudas amigos gasto1
+        nuevasDeudas = crearDeudas amigos gasto2
         todasDeudas = deudas ++ nuevasDeudas 
     putStrLn "Deudas generadas:"
     print todasDeudas
