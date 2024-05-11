@@ -1,11 +1,11 @@
---Objetivo 1
+--OBJETIVO 1
 data Persona = Persona {
     nombre :: String,
     deudas :: [Deuda]
 } deriving(Show, Eq)
 
 --------------------------------------------------------------------------------------------------------------------------------------------
---Objetivo 2
+--OBJETIVO 2
 data Gasto = Gasto {
     pagador :: Persona,
     montoTotal :: Float
@@ -17,31 +17,35 @@ data Deuda = Deuda {
 } deriving(Show, Eq)
 
 
--- Funciones
-
-imprimirDeudas :: [Persona] -> IO ()
-imprimirDeudas [] = return ()
-imprimirDeudas (persona : restoAmigos) = do
-    mapM_ (\deuda -> putStrLn $ show (nombre persona) ++ " le debe $" ++ show (montoDeuda deuda) ++ " a " ++ nombre (acreedor deuda)) (deudas persona)
-    imprimirDeudas restoAmigos
-
-{- imprimirDeudas [persona : restoAmigos] = do
-    map (\deuda -> putStrLn $ show persona ++ " le debe $" ++ show (montoDeuda deuda) ++ " a " ++ nombre (acreedor deuda) ) (deudas persona)
- -}
-agregarDeuda persona deuda = persona { deudas = deudas persona ++ [deuda] }
-
 calcularDeudas :: Foldable t => t a -> Gasto -> Float
 calcularDeudas amigos (Gasto pagador montoTotal) =
     montoTotal / fromIntegral (length amigos)
 
+obtenerAcreedor :: Gasto -> Persona
 obtenerAcreedor (Gasto pagador montoTotal) = pagador
 
+obtenerDeudores []
+obtenerDeudores (persona : restoAmigos) (Gasto pagador montoTotal) =
+    if persona == pagador
+        then restoAmigos
+        else persona : obtenerDeudores restoAmigos (Gasto pagador montoTotal)
+
+--agregarDeuda :: Persona -> Deuda -> Persona
+--agregarDeuda persona deuda = persona { deudas = deudas persona ++ [deuda] }
+
+agregarDeuda [] _ =  []
+agregarDeuda (persona : restoAmigos) deuda =
+    if persona /= acreedor deuda                      
+        then persona { deudas = deudas persona ++ [deuda] } : agregarDeuda restoAmigos deuda                                        
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+--OBJETIVO 3
+
+actualizarDeuda :: Deuda -> (Float -> t -> Float) -> t -> Deuda
 actualizarDeuda deuda funcion monto =
     deuda { montoDeuda = funcion (montoDeuda deuda) monto }
 
-
---------------------------------------------------------------------------------------------------------------------------------------------
---Objetivo 3
+actualizarDeudasDePersonas :: Integral t => [Persona] -> Gasto -> t -> [Persona]
 actualizarDeudasDePersonas [] _ _ = []
 actualizarDeudasDePersonas (persona : restoPersonas) (Gasto pagador montoTotal) cantidadPersonas =
     let montoPorDeudor = montoTotal / fromIntegral cantidadPersonas
@@ -52,6 +56,12 @@ actualizarDeudasDePersonas (persona : restoPersonas) (Gasto pagador montoTotal) 
     in
     persona { deudas = nuevasDeudas } : actualizarDeudasDePersonas restoPersonas (Gasto pagador montoTotal) cantidadPersonas
 
+imprimirDeudas :: [Persona] -> IO ()
+imprimirDeudas [] = return ()
+imprimirDeudas (persona : restoAmigos) = do
+    mapM_ (\deuda -> putStrLn $ show (nombre persona) ++ " le debe $" ++ show (montoDeuda deuda) ++ " a " ++ nombre (acreedor deuda)) (deudas persona)
+    imprimirDeudas restoAmigos
+    
 
 main :: IO ()
 main = do
@@ -61,17 +71,20 @@ main = do
         amigos = [juan, pedro, santiago]
         gasto1 = Gasto juan 60
         deuda1 = Deuda {acreedor = obtenerAcreedor gasto1, montoDeuda = calcularDeudas amigos gasto1}
+        --pedroConDeudas1 = agregarDeuda pedro deuda1
+        --santiagoConDeudas1 = agregarDeuda santiago deuda1
+        amigosConDeuda1 = agregarDeuda amigos deuda1
         gasto2 = Gasto pedro 90
         deuda2 = Deuda {acreedor = obtenerAcreedor gasto2, montoDeuda = calcularDeudas amigos gasto2}
-        juanConDeudas1 = agregarDeuda juan deuda2
-        pedroConDeudas1 = agregarDeuda pedro deuda1
-        santiagoConDeudas1 = agregarDeuda santiago deuda1
-        santiagoConDeudas2 = agregarDeuda santiagoConDeudas1 deuda2
-        amigosConDeudas = [juanConDeudas1, pedroConDeudas1, santiagoConDeudas2]
-        amigosConDeudasActualizadas = actualizarDeudasDePersonas amigosConDeudas gasto2 (length amigosConDeudas)
-    
+       -- amigosConDeuda2 = agregarDeuda amigosConDeuda1 deuda2
+        --juanConDeudas1 = agregarDeuda juan deuda2
+        --santiagoConDeudas2 = agregarDeuda santiagoConDeudas1 deuda2
+        --amigosConDeudas = [juanConDeudas1, pedroConDeudas1, santiagoConDeudas2]
+        --amigosConDeudasActualizadas = actualizarDeudasDePersonas amigosConDeudas gasto2 (length amigosConDeudas)
+
+    print amigosConDeuda1
     putStrLn "Deudas:"
-    imprimirDeudas amigosConDeudasActualizadas
+    --imprimirDeudas amigosConDeudasActualizadas
     --putStrLn "Amigos sin deudas:"
     --putStrLn ""
     --print amigos
