@@ -31,6 +31,7 @@ crearDeudasDeGasto amigos (Gasto pagador monto) =
     in map (\deudor -> Deuda deudor pagador montoPorPersona) deudores
 
 
+-- Objetivo 2
 -- Recibe una lista de deudas y las empareja. Ej: [deuda1,deuda2,deuda3] -> [(deuda1,deuda2),(deuda2,deuda3),(deuda1,deuda3)]
 emparejarDeudas :: (Eq a) => [a] -> [(a, a)]
 emparejarDeudas [] = []
@@ -74,7 +75,8 @@ obtenerDeudasModificadas deudas1 deudas2 = filter (\deuda2 -> (any (coincideDeud
   where
     coincideDeuda :: Deuda -> Deuda -> Bool
     coincideDeuda (Deuda deudor1 acreedor1 _) (Deuda deudor2 acreedor2 _) =
-      (deudor1 == deudor2 || deudor1 == acreedor2) && (acreedor1 == deudor2 || acreedor1 == acreedor2)
+        (deudor1 == deudor2 || deudor1 == acreedor2) && (acreedor1 == deudor2 || acreedor1 == acreedor2)
+
 
 -- Objetivo 4
 -- Función para calcular el balance de una persona dentro del grupo
@@ -84,9 +86,9 @@ consultarBalance persona gastos amigos =
         deudasPersona = filter (\deuda -> deudor deuda == persona || acreedor deuda == persona) deudas
         montoTotalAcreedor = sum [montoDeuda deuda | deuda <- deudasPersona, acreedor deuda == persona]
         montoTotalDeudor = sum [montoDeuda deuda | deuda <- deudasPersona, deudor deuda == persona]
-    in abs (montoTotalAcreedor - montoTotalDeudor)
+    in (montoTotalAcreedor - montoTotalDeudor)
 
--- Objetivo 4.1
+
 -- Función para listar el balance de todos los integrantes del grupo
 listarBalances :: [Gasto] -> [Persona] -> [(Persona, Float)]
 listarBalances gastos amigos = [(persona, consultarBalance persona gastos amigos) | persona <- amigos]
@@ -95,8 +97,8 @@ listarBalances gastos amigos = [(persona, consultarBalance persona gastos amigos
 -- Recibe una lista de deudas y una lista de deudas sin duplicados
 imprimirDeudas :: [Deuda] -> IO ()
 imprimirDeudas deudas = do
-    let deudasSet = Set.fromList deudas -- Convertir la lista de deudas a un conjunto para eliminar duplicados
-    imprimirDeudasSet (Set.toList deudasSet) -- Convertir el conjunto nuevamente a una lista y llamar a la funci贸n auxiliar
+    let deudasSet = Set.fromList deudas
+    imprimirDeudasSet (Set.toList deudasSet)
 
 
 -- Recibe una lista de deudas y las muestra por pantalla
@@ -109,7 +111,6 @@ imprimirDeudasSet ((Deuda deudor acreedor montoDeuda): restoDeudas) = do
     imprimirDeudasSet restoDeudas
 
 
-
 -- Ejemplo de uso
 main :: IO ()
 main = do
@@ -117,11 +118,12 @@ main = do
         pedro = Persona "Pedro" 
         santiago = Persona "Santiago"
         amigos = [juan, pedro, santiago]
+        --Objetivo 2
         gasto1 = Gasto juan 60
         gasto2 = Gasto pedro 90
-        deuda1 = crearDeudasDeGasto amigos gasto1
-        deuda2 = crearDeudasDeGasto amigos gasto2
-        deudasCompletas = deuda1 ++ deuda2
+        deudas1 = crearDeudasDeGasto amigos gasto1
+        deudas2 = crearDeudasDeGasto amigos gasto2
+        deudasCompletas = deudas1 ++ deudas2
         -- Objetivo 3
         deudasActualizadas = actualizarDeudas deudasCompletas
         deudasDiferentes = eliminarDeudas deudasCompletas deudasActualizadas
