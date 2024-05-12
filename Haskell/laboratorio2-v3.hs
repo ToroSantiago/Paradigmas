@@ -1,19 +1,19 @@
 import qualified Data.Set as Set
 
--- Definición del tipo de datos para representar una persona
+-- Definici贸n del tipo de datos para representar una persona
 data Persona = Persona {
     nombre :: String
 } deriving (Show, Eq, Ord)
 
 
--- Definición del tipo de datos para representar un gasto
+-- Definici贸n del tipo de datos para representar un gasto
 data Gasto = Gasto {
     pagador :: Persona,
     monto :: Float
 } deriving (Show)
 
 
--- Definición del tipo de datos para representar una deuda
+-- Definici贸n del tipo de datos para representar una deuda
 data Deuda = Deuda {
     deudor :: Persona,
     acreedor :: Persona,
@@ -46,8 +46,6 @@ gestionarMontosDeDeudas (deuda1, deuda2) =
     if montoDeuda deuda1 >= montoDeuda deuda2
         then [Deuda (deudor deuda1) (acreedor deuda1)  ((montoDeuda deuda1) - (montoDeuda deuda2))]
         else [Deuda (deudor deuda2) (acreedor deuda2)  ((montoDeuda deuda2) - (montoDeuda deuda1))]
-        --then [deuda1 { montoDeuda = montoDeuda deuda1 - montoDeuda deuda2 }]
-        --else [deuda2 { montoDeuda = montoDeuda deuda2 - montoDeuda deuda1 }]
 
 
 -- Recibe una lista de tuplas de deudas y devuelve una lista con las deudas saldadas donde corresponda
@@ -71,25 +69,34 @@ eliminarDeudas [] deudas = deudas
 eliminarDeudas (x:xs) deudas = eliminarDeudas xs (filter (\d -> d /= x) deudas)
 
 
-obtenerDeudasModificadas [] deudas = []
-obtenerDeudasModificadas (x:xs) deudasActualizadas = 
-    obtenerDeudasModificadas xs (filter (\d -> (acreedor d /= acreedor x)&&(acreedor d /= deudor x)) deudasActualizadas)
+obtenerDeudasModificadas :: [Deuda] -> [Deuda] -> [Deuda]
+obtenerDeudasModificadas deudas1 deudas2 = filter (\deuda2 -> (any (coincideDeuda deuda2) deudas1)) deudas2
+  where
+    coincideDeuda :: Deuda -> Deuda -> Bool
+    coincideDeuda (Deuda deudor1 acreedor1 _) (Deuda deudor2 acreedor2 _) =
+      (deudor1 == deudor2 || deudor1 == acreedor2) && (acreedor1 == deudor2 || acreedor1 == acreedor2)
 
+-- Objetivo 4
+-- Función para calcular el balance de una persona dentro del grupo
+consultarBalance :: Persona -> [Gasto] -> [Persona] -> Float
+consultarBalance persona gastos amigos =
+    let deudas = concatMap (crearDeudasDeGasto amigos) gastos
+        deudasPersona = filter (\deuda -> deudor deuda == persona || acreedor deuda == persona) deudas
+        montoTotalAcreedor = sum [montoDeuda deuda | deuda <- deudasPersona, acreedor deuda == persona]
+        montoTotalDeudor = sum [montoDeuda deuda | deuda <- deudasPersona, deudor deuda == persona]
+    in abs (montoTotalAcreedor - montoTotalDeudor)
 
--- Recibe una lista de deudas y las muestra por pantalla
-{- imprimirDeudas :: [Deuda] -> IO ()
-imprimirDeudas [] = return ()
-imprimirDeudas ((Deuda deudor acreedor montoDeuda): restoDeudas) = do
-    if montoDeuda > 0 
-        then putStrLn $ nombre deudor ++ " le debe $" ++ show montoDeuda ++ " a " ++ nombre acreedor 
-        else return ()
-    imprimirDeudas restoDeudas  -}
+-- Objetivo 4.1
+-- Función para listar el balance de todos los integrantes del grupo
+listarBalances :: [Gasto] -> [Persona] -> [(Persona, Float)]
+listarBalances gastos amigos = [(persona, consultarBalance persona gastos amigos) | persona <- amigos]
+
 
 -- Recibe una lista de deudas y una lista de deudas sin duplicados
 imprimirDeudas :: [Deuda] -> IO ()
 imprimirDeudas deudas = do
     let deudasSet = Set.fromList deudas -- Convertir la lista de deudas a un conjunto para eliminar duplicados
-    imprimirDeudasSet (Set.toList deudasSet) -- Convertir el conjunto nuevamente a una lista y llamar a la función auxiliar
+    imprimirDeudasSet (Set.toList deudasSet) -- Convertir el conjunto nuevamente a una lista y llamar a la funci贸n auxiliar
 
 
 -- Recibe una lista de deudas y las muestra por pantalla
@@ -100,14 +107,6 @@ imprimirDeudasSet ((Deuda deudor acreedor montoDeuda): restoDeudas) = do
         then putStrLn $ nombre deudor ++ " le debe $" ++ show montoDeuda ++ " a " ++ nombre acreedor 
         else return ()
     imprimirDeudasSet restoDeudas
-
-{- 
-imprimirDeudasEmparejadas :: [(Deuda, Deuda)] -> IO ()
-imprimirDeudasEmparejadas [] = return ()
-imprimirDeudasEmparejadas (((Deuda deudor1 acreedor1 montoDeuda1),(Deuda deudor2 acreedor2 montoDeuda2)): restoDeudasEmparejadas) = do
-        putStrLn $ "tupla:\n" ++ nombre deudor1 ++ " le debe $" ++ show montoDeuda1 ++ " a " ++ nombre acreedor1 ++ "\n" ++ 
-                   nombre deudor2 ++ " le debe $" ++ show montoDeuda2 ++ " a " ++ nombre acreedor2  
-        imprimirDeudasEmparejadas restoDeudasEmparejadas -}
 
 
 
@@ -123,11 +122,14 @@ main = do
         deuda1 = crearDeudasDeGasto amigos gasto1
         deuda2 = crearDeudasDeGasto amigos gasto2
         deudasCompletas = deuda1 ++ deuda2
+        -- Objetivo 3
         deudasActualizadas = actualizarDeudas deudasCompletas
         deudasDiferentes = eliminarDeudas deudasCompletas deudasActualizadas
         deudasModificadas = obtenerDeudasModificadas deudasDiferentes deudasActualizadas
         deudasSinModificar = eliminarDeudas deudasModificadas deudasActualizadas
         deudasNuevas = deudasSinModificar ++ deudasDiferentes
+        -- Objetivo 4
+        deudasBalanceadas = listarBalances [gasto1, gasto2] amigos
 
     putStrLn "\nDeudas completas:"
     imprimirDeudas deudasCompletas
@@ -136,7 +138,7 @@ main = do
     imprimirDeudas deudasActualizadas
 
     putStrLn "\nDeudas diferentes:"
-    imprimirDeudas deudasModificadas
+    imprimirDeudas deudasDiferentes
 
     putStrLn "\nDeudas modificadas:"
     imprimirDeudas deudasModificadas
@@ -144,6 +146,8 @@ main = do
     putStrLn "\nDeudas sin modificar:"
     imprimirDeudas deudasSinModificar
 
-    --putStrLn "\nDeudas nuevas:"
-    --imprimirDeudas deudasNuevas
-    
+    putStrLn "\nDeudas nuevas:"
+    imprimirDeudas deudasNuevas
+
+    putStrLn "\nBalance de deudas:"
+    print deudasBalanceadas
