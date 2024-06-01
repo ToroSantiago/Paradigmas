@@ -1,0 +1,67 @@
+"-------MUERTE POR FALTA DE COMIDA/AGUA-------"
+"Crear instancias de cada tipo de sala"
+cocina := Cocina new.
+cisterna := Cisterna new.
+generador1 := Generador new.
+generador2 := Generador new.
+dormitorio := Dormitorio new.
+
+"Crear una instancia de Refugio"
+refugio1 := Refugio new.
+refugio1 agregarPersonas: 5.
+
+"Agregar salas al refugio"
+refugio1 agregarSala: cocina.
+refugio1 agregarSala: cisterna.
+refugio1 agregarSala: generador1.
+refugio1 agregarSala: dormitorio.
+refugio1 agregarPersonas: 5.
+refugio1 agregarSala: generador2.
+refugio1 mostrarEstado.
+
+refugio1 pasarDia.
+
+"---------MUERTE POR FALTA DE ENERGIA---------"
+"Crear instancias de cada tipo de sala"
+cocina1 := Cocina new.
+cocina2 := Cocina new.
+cisterna1 := Cisterna new.
+cisterna2 := Cisterna new.
+generador := Generador new.
+dormitorio1 := Dormitorio new.
+dormitorio2 := Dormitorio new.
+
+"Crear una instancia de Refugio"
+refugio2 := Refugio new.
+refugio2 agregarPersonas: 5.
+
+"Agregar salas al refugio"
+refugio2 agregarSala: cocina1.
+refugio2 agregarSala: cocina2.
+refugio2 agregarSala: cisterna1.
+refugio2 agregarSala: dormitorio1.
+refugio2 agregarPersonas: 5.
+refugio2 agregarSala: cisterna2.
+refugio2 agregarSala: generador.
+refugio2 agregarSala: dormitorio2.
+refugio2 mostrarEstado.
+
+refugio2 pasarDia.
+
+"-------------AUTOSUFICIENTE-------------"
+"Crear instancias de cada tipo de sala"
+cocina3 := Cocina new.
+cisterna3 := Cisterna new.
+generador3 := Generador new.
+
+"Crear una instancia de Refugio"
+refugio3 := Refugio new.
+refugio3 agregarPersonas: 5.
+
+"Agregar salas al refugio"
+refugio3 agregarSala: cocina3.
+refugio3 agregarSala: cisterna3.
+refugio3 agregarSala: generador.
+refugio3 mostrarEstado.
+
+refugio3 pasarDia.
